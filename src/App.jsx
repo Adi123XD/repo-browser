@@ -177,7 +177,7 @@ function App() {
             </div>
           )}
           <motion.div 
-            className="flex-grow"
+            className="flex-grow overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >

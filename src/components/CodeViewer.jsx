@@ -14,8 +14,8 @@ function CodeViewer({ file, loading, error }) {
     return (
       <div className="h-full flex items-center justify-center bg-[var(--vscode-editor-bg)] text-[var(--vscode-text)]">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-t-2 border-blue-500 rounded-full animate-spin" 
-               style={{ borderTopColor: '#007acc' }} />
+          <div className="w-5 h-5 border-2 border-t-2 border-blue-500 rounded-full animate-spin"
+            style={{ borderTopColor: '#007acc' }} />
           <span>Loading...</span>
         </div>
       </div>
@@ -87,20 +87,21 @@ function CodeViewer({ file, loading, error }) {
   }
 
   return (
-    <motion.div 
-      className="h-full overflow-auto custom-scrollbar bg-[var(--vscode-editor-bg)]"
+    <motion.div
+      className="h-full overflow-y-auto overflow-x-auto custom-scrollbar bg-[var(--vscode-editor-bg)]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
       <div className="p-4">
-        <pre className="relative">
-          <code className={getLanguage(file.name)}>
+        <pre className="relative min-w-full">
+          <code className={`${getLanguage(file.name)} min-w-full`}>
             {file.content}
           </code>
         </pre>
       </div>
     </motion.div>
+
   );
 }
 
