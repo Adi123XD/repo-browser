@@ -14,15 +14,29 @@ import {
   VscSymbolClass,
   VscSymbolMethod,
   VscSymbolVariable,
-  VscSettingsGear
+  VscSettingsGear,
+  VscCloudUpload,
 } from 'react-icons/vsc';
 
 function FileTree({ fileMap, onFileSelect, selectedFile }) {
   const [expandedFolders, setExpandedFolders] = useState(new Set());
+  const [commitMessage, setCommitMessage] = useState('');
+
+  const handleCommitPush = () => {
+    if (!commitMessage.trim()) {
+      alert('Please enter a commit message.');
+      return;
+    }
+
+    console.log('Committing and pushing with message:', commitMessage);
+    setCommitMessage('');
+  };
 
   const getFileIcon = (type, name) => {
     if (type === 'tree') {
-      return expandedFolders.has(name) ? <VscFolderOpened className="text-[#dcb67a]" /> : <VscFolder className="text-[#dcb67a]" />;
+      return expandedFolders.has(name)
+        ? <VscFolderOpened className="text-[#dcb67a]" />
+        : <VscFolder className="text-[#dcb67a]" />;
     }
 
     const ext = name.split('.').pop().toLowerCase();
@@ -53,11 +67,11 @@ function FileTree({ fileMap, onFileSelect, selectedFile }) {
 
   const buildTreeStructure = () => {
     const tree = {};
-    
+
     Object.entries(fileMap).forEach(([path, info]) => {
       const parts = path.split('/');
       let currentLevel = tree;
-      
+
       parts.forEach((part, index) => {
         if (!currentLevel[part]) {
           currentLevel[part] = {
@@ -65,13 +79,13 @@ function FileTree({ fileMap, onFileSelect, selectedFile }) {
             path: parts.slice(0, index + 1).join('/'),
             type: index === parts.length - 1 ? info.type : 'tree',
             children: {},
-            sha: info.sha
+            sha: info.sha,
           };
         }
         currentLevel = currentLevel[part].children;
       });
     });
-    
+
     return tree;
   };
 
@@ -152,6 +166,31 @@ function FileTree({ fileMap, onFileSelect, selectedFile }) {
 
   return (
     <div className="h-full overflow-y-auto custom-scrollbar bg-[var(--vscode-sidebar-bg)] text-[var(--vscode-text)]">
+      {/* Source Control Commit UI */}
+      <div className="px-2 py-3 border-b border-[var(--vscode-sideBar-border)]">
+        <div className="text-sm font-semibold mb-2">SOURCE CONTROL</div>
+        <input
+          type="text"
+          className="w-full p-1 px-2 rounded text-sm bg-[var(--vscode-input-background)] text-[var(--vscode-input-foreground)] border border-[var(--vscode-input-border)] focus:outline-none focus:ring focus:ring-blue-400"
+          placeholder="Message (Ctrl+Enter to commit)"
+          value={commitMessage}
+          onChange={(e) => setCommitMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+              handleCommitPush();
+            }
+          }}
+        />
+        <button
+          onClick={handleCommitPush}
+          className="mt-2 w-full flex items-center justify-center gap-2 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
+        >
+          <VscCloudUpload className="w-4 h-4" />
+          Commit & Push
+        </button>
+      </div>
+
+      {/* File Explorer */}
       <div className="py-2">
         <AnimatePresence>
           {Object.values(treeStructure)
