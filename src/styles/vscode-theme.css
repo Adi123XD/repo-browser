@@ -1,0 +1,107 @@
+/* VS Code-like theme */
+:root {
+  --vscode-bg: #1e1e1e;
+  --vscode-sidebar-bg: #252526;
+  --vscode-editor-bg: #1e1e1e;
+  --vscode-text: #d4d4d4;
+  --vscode-text-dim: #858585;
+  --vscode-highlight: #264f78;
+  --vscode-selection: #264f78;
+  --vscode-border: #404040;
+  --vscode-active-tab: #1e1e1e;
+  --vscode-inactive-tab: #2d2d2d;
+  --vscode-tab-border: #252526;
+  --vscode-scrollbar-bg: #1e1e1e;
+  --vscode-scrollbar-thumb: #424242;
+  --vscode-scrollbar-hover: #4f4f4f;
+}
+
+/* VS Code-like scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--vscode-scrollbar-bg);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbar-thumb);
+  border: 4px solid var(--vscode-scrollbar-bg);
+  border-radius: 7px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbar-hover);
+}
+
+/* VS Code-like file tree */
+.tree-item {
+  color: var(--vscode-text);
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 0;
+  transition: background-color 0.1s ease;
+}
+
+.tree-item:hover {
+  background-color: rgba(90, 93, 94, 0.31);
+}
+
+.tree-item.selected {
+  background-color: var(--vscode-highlight);
+}
+
+/* VS Code-like animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.2s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* VS Code-like syntax highlighting theme */
+.hljs {
+  background: var(--vscode-editor-bg) !important;
+  color: var(--vscode-text) !important;
+}
+
+/* VS Code-like editor tabs */
+.editor-tab {
+  background-color: var(--vscode-inactive-tab);
+  color: var(--vscode-text-dim);
+  border: 1px solid var(--vscode-tab-border);
+  border-bottom: none;
+  transition: background-color 0.2s ease;
+}
+
+.editor-tab.active {
+  background-color: var(--vscode-active-tab);
+  color: var(--vscode-text);
+  border-top: 2px solid #007acc;
+}

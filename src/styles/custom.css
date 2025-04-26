@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for file tree and code view */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    width: 100%;
+  }
+  .tree-item {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tree-item:hover {
+    background-color: #e2e8f0;
+  }
+  .tree-item.selected {
+    background-color: #bfdbfe;
+    font-weight: 600;
+  }
+  .tree-level-1 { padding-left: 1rem; }
+  .tree-level-2 { padding-left: 2rem; }
+  .tree-level-3 { padding-left: 3rem; }
+  .tree-level-4 { padding-left: 4rem; }
+  .tree-level-5 { padding-left: 5rem; }
+  
+  .loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  pre code {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  pre code::-webkit-scrollbar {
+    display: none;
+  }
