@@ -1,14 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Editor from 'react-simple-code-editor';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
 
 function CodeViewer({ file, loading, error }) {
+  const [code, setCode] = useState('');
+
   useEffect(() => {
     if (file?.content) {
-      hljs.highlightAll();
+      setCode(file.content);
     }
   }, [file]);
+
+  const highlightCode = (code) => {
+    const language = getLanguage(file?.name || '');
+    if (language && hljs.getLanguage(language)) {
+      return hljs.highlight(code, { language }).value;
+    }
+    return hljs.highlightAuto(code).value;
+  };
 
   if (loading) {
     return (
@@ -43,13 +54,11 @@ function CodeViewer({ file, loading, error }) {
     );
   }
 
-  // Try to detect if the content is binary
   const isBinary = (content) => {
     const nonPrintable = content.match(/[\x00-\x08\x0E-\x1F\x7F-\xFF]/g) || [];
     return nonPrintable.length > content.length * 0.1;
   };
 
-  // Try to determine file type for syntax highlighting
   const getLanguage = (filename) => {
     const ext = filename.split('.').pop().toLowerCase();
     const langMap = {
@@ -94,14 +103,22 @@ function CodeViewer({ file, loading, error }) {
       transition={{ duration: 0.2 }}
     >
       <div className="p-4">
-        <pre className="relative min-w-full">
-          <code className={`${getLanguage(file.name)} min-w-full`}>
-            {file.content}
-          </code>
-        </pre>
+        <Editor
+          value={code}
+          onValueChange={setCode}
+          highlight={highlightCode}
+          padding={10}
+          textareaClassName="bg-transparent text-[var(--vscode-text)] focus:outline-none min-w-full"
+          style={{
+            backgroundColor: 'var(--vscode-editor-bg)',
+            color: 'var(--vscode-text)',
+            fontFamily: '"Fira Code", monospace',
+            fontSize: 14,
+            minHeight: '100%'
+          }}
+        />
       </div>
     </motion.div>
-
   );
 }
 
