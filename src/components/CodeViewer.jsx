@@ -8,6 +8,7 @@ import 'highlight.js/styles/github-dark.css';
 
 function CodeViewer({ file, loading, error }) {
   const [code, setCode] = useState('');
+  const [editMode, setEditMode] = useState(false); // true = edit, false = read-only
   const buttonClass = "px-3 py-1 rounded-md bg-[var(--vscode-button-background)] hover:bg-[var(--vscode-button-hoverBackground)] text-[var(--vscode-button-foreground)] text-sm font-medium";
   const disabledButtonClass = "opacity-50 cursor-not-allowed";
 
@@ -58,7 +59,9 @@ function CodeViewer({ file, loading, error }) {
     link.click();
     document.body.removeChild(link);
   };
-
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+  }
   const highlightCode = (code) => {
     const language = getLanguage(file?.name || '');
     if (language && hljs.getLanguage(language)) {
@@ -74,6 +77,28 @@ function CodeViewer({ file, loading, error }) {
       .join('\n')
       .replace(/\n{3,}/g, '\n\n'); // max 2 empty lines
     setCode(formatted);
+  };
+  // Function to handle function or constant click in read-only mode
+  const handleSymbolClick = (e, editor) => {
+    const model = editor.getModel();
+    const position = editor.getPosition();
+    const word = model.getWordAtPosition(position);
+
+    if (word && (word.word === 'functionName' || word.word === 'constantName')) {
+      // Find the symbol's location (function/constant) in the model
+      const matches = model.findMatches(word.word, true, true, false, null, true);
+      if (matches.length > 0) {
+        // Reveal the first match's position (the definition)
+        const range = matches[0].range;
+        editor.revealRangeInCenter(range);
+        // Optionally, you could also highlight the symbol to give more visual feedback
+        editor.setSelection(range);
+      }
+    }
+  };
+  // Create the read-only Monaco editor in `editMode === false`
+  const createReadOnlyEditor = (editor, monaco) => {
+    editor.onMouseDown((e) => handleSymbolClick(e, editor));
   };
 
   if (loading) {
@@ -113,32 +138,6 @@ function CodeViewer({ file, loading, error }) {
     const nonPrintable = content.match(/[\x00-\x08\x0E-\x1F\x7F-\xFF]/g) || [];
     return nonPrintable.length > content.length * 0.1;
   };
-
-  // const getLanguage = (filename) => {
-  //   const ext = filename.split('.').pop().toLowerCase();
-  //   const langMap = {
-  //     js: 'javascript',
-  //     jsx: 'javascript',
-  //     ts: 'typescript',
-  //     tsx: 'typescript',
-  //     py: 'python',
-  //     rb: 'ruby',
-  //     java: 'java',
-  //     cpp: 'cpp',
-  //     c: 'c',
-  //     cs: 'csharp',
-  //     css: 'css',
-  //     html: 'html',
-  //     xml: 'xml',
-  //     md: 'markdown',
-  //     json: 'json',
-  //     yaml: 'yaml',
-  //     yml: 'yaml',
-  //     sh: 'bash',
-  //     bash: 'bash',
-  //   };
-  //   return langMap[ext] || '';
-  // };
   const getLanguage = (filename) => {
     const ext = filename.split('.').pop().toLowerCase();
     const langMap = {
@@ -164,7 +163,7 @@ function CodeViewer({ file, loading, error }) {
     };
     return langMap[ext] || 'plaintext';
   };
-  
+
 
   if (isBinary(file.content)) {
     return (
@@ -185,27 +184,12 @@ function CodeViewer({ file, loading, error }) {
     >
       <div className="p-4 space-y-2">
         <div className="flex gap-2 flex-wrap">
+          <button onClick={toggleEditMode} className={buttonClass}>{(editMode) ? 'Read' : 'Edit'}</button>
           <button onClick={downloadFile} className={buttonClass}>Download</button>
           <button onClick={undo} disabled={!history.length} className={`${buttonClass} ${!history.length ? disabledButtonClass : ''}`}>Undo</button>
           <button onClick={redo} disabled={!redoStack.length} className={`${buttonClass} ${!redoStack.length ? disabledButtonClass : ''}`}>Redo</button>
           <button onClick={formatCode} className={buttonClass}>Format</button>
         </div>
-
-        {/* <Editor
-          value={code}
-          // onValueChange={setCode}
-          onValueChange={handleCodeChange}
-          highlight={highlightCode}
-          padding={10}
-          textareaClassName="bg-transparent text-[var(--vscode-text)] focus:outline-none min-w-full"
-          style={{
-            backgroundColor: 'var(--vscode-editor-bg)',
-            color: 'var(--vscode-text)',
-            fontFamily: '"Fira Code", monospace',
-            fontSize: 14,
-            minHeight: '100%'
-          }}
-        /> */}
         <Editor
           height="80vh"
           defaultLanguage={getLanguage(file.name)}
@@ -222,7 +206,9 @@ function CodeViewer({ file, loading, error }) {
             wordWrap: "on",
             tabSize: 2,
             scrollBeyondLastLine: false,
+            readOnly: !editMode, // Switch between edit and read-only mode
           }}
+          editorDidMount={createReadOnlyEditor} // Attach the read-only editor logic
         />
 
       </div>
